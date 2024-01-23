@@ -1,0 +1,380 @@
+\ProvidesFile{lecture-03.tex}[Лекция 3]
+
+\newpage
+
+\section{Норма и анализ сходимости}
+
+\begin{definition}
+    Пусть задано линейное векторное пространство $V$ над полем $\mathbb{R}$. \\ Функцию $\lVert \cdot \rVert: V \longrightarrow \mathbb{R}$ будем называть \textit{нормой}, если выполнены следующие свойства:
+
+    \begin{itemize}
+        \item $\forall \, x \in V: \lVert x \rVert \geqslant 0$
+        \item $\lVert x \rVert = 0 \iff x = 0$
+        \item $\lVert \alpha x \rVert = |\alpha| \cdot \lVert x \rVert$
+        \item $\forall \, x, y \in V: \lVert x + y \rVert \leqslant \lVert x \rVert + \lVert y \rVert$ --- неравенство треугольника
+    \end{itemize}
+
+    Пространство $V$ с нормой $\lVert \cdot \rVert$ называется \textit{нормированным пространством}
+\end{definition}
+
+\subsection{Векторные $l_p$ нормы}
+
+Важным примером норм является $l_p$ норма. Пусть $V = \mathbb{R}^n$. Тогда для $x \in V$, который будем записывать в виде вектор-столбца $x = [x_1, \ldots, x_n]^{\top}$, определим $l_p$ норму:
+
+\[
+\lVert x \rVert_p = \left(\sum\limits_{i = 1}^n |x_i|^p\right)^{1/p}
+\]
+
+Существуют особые виды $l_p$ нормы:
+
+\begin{itemize}
+    \item $p = 1: \lVert x \rVert_1 = |x_1| + \ldots + |x_n|$
+    \item $p = 2: \lVert x \rVert_2 = \sqrt{|x_1|^2 + \ldots + |x_n|^2}$
+    \item $p = \infty: \lVert x \rVert_{\infty} = \max\limits_{i} |x_i|$
+\end{itemize}
+
+\begin{claim}
+    Докажем, что приведенные функции являются нормами
+\end{claim}
+
+\begin{proof}
+    Разберем каждый случай по отдельности:
+
+    \begin{enumerate}
+        \item Случай $p = 1$
+
+            \begin{itemize}
+                \item $\lVert x \rVert_1 \geqslant 0$ очевидно. Пусть $\lVert x \rVert = 0$. Тогда $|x_1| + \ldots + |x_n| = 0 \iff x_1 = \ldots = x_n = 0 \iff x = 0$. \\В обратную сторону очевидно
+
+                \item $\lVert \alpha x \rVert_1 = |\alpha x_1| + \ldots + |\alpha x_n| = |\alpha| \cdot (|x_1| + \ldots + |x_n|) = |\alpha| \cdot \lVert x \rVert_1$
+
+                \item Зафиксируем $x, y \in V$. Тогда
+                \[
+                \lVert x + y \rVert_1 = \sum\limits_{i = 1}^n |x_i + y_i| \leqslant \sum\limits_{i = 1}^n |x_i| + \sum\limits_{i = 1}^n |y_i| = \lVert x \rVert_1 + \lVert y \rVert_1
+                \]
+            \end{itemize}
+
+        \item Случай $p = 2$
+
+            \begin{itemize}
+                \item Первые три свойства проверяются аналогично. Докажем только неравенство треугольника. Зафиксируем $x, y \in V$ и воспользуемся \href{https://en.wikipedia.org/wiki/Cauchy%E2%80%93Schwarz_inequality}{неравенством Коши-Буняковского}:
+
+                \[
+                \lVert x + y \rVert_2^2 = \sum\limits_{i = 1}^n |x_i + y_i|^2 = \sum\limits_{i = 1}^n |x_i|^2 + \sum\limits_{i = 1}^n |y_i|^2 + 2 \sum\limits_{i = 1}^{n} |x_i| \cdot |y_i|
+                \leqslant
+                %
+                \lVert x \rVert_2^2 + \lVert y \rVert_2^2 + 2 \lVert x \rVert_2 \cdot \lVert y \rVert_2 = (\lVert x \rVert_2 + \lVert y \rVert_2)^2
+                \]
+            \end{itemize}
+
+        \item Случай $p \in \mathbb{R}: p > 1$
+
+            \begin{itemize}
+                \item Первые три свойства проверяются аналогично. Докажем неравенство треугольника
+
+                \item Предположим, что $x, y \in V: x \neq 0, y \neq 0$ и $\forall \, i \in \{1, \ldots, n\}: x_i \geqslant 0$ без ограничения общности рассуждений. \\ Зафиксируем $x$ и будем искать максимум $f(y) = \lVert x + y \rVert_p$ по $y$ при условии, что $\lVert y \rVert_p = C = \mathrm{const}$
+
+                Из курса математического анализа известно, что непрерывная функция на компакте достигает своего максимума. Пусть $f(y)$ достигает максимума в точке $y^{\star}$
+
+                Тогда запишем уравнение касательной плоскости к поверхности $\lVert y \rVert_p = C$: \\($dy = [dy_1, \ldots, dy_n]^{\top}$ --- вектор приращений)
+
+                \begin{equation}\label{tangent_plane}
+                \sum\limits_{i = 1}^n \frac{\partial}{\partial y_i} \lVert y \rVert_p^p \, dy_i = \sum\limits_{i = 1}^n p |y_i|^{p - 1} \, dy_i = 0 = \Big\langle \nabla \lVert y \rVert_p^p, \, dy \Big\rangle
+                \end{equation}
+
+                \item Так как $y^{\star}$ --- точка экстремума функции, то найдем производную $f(y)^p$:
+
+                \begin{equation}\label{max_point}
+                \frac{d}{dy}f(y^{\star})^p = \sum\limits_{i = 1}^{n} p |x_i + y^{\star}|^{p - 1} \, dy_i = 0 = \Big\langle \nabla f(y^{\star})^p, \, dy \Big\rangle
+                \end{equation}
+
+                \item Из \eqref{tangent_plane} в точке $y^{\star}$ и \eqref{max_point} следует, что векторы
+
+                \[\nabla \lVert y^{\star} \rVert_p^p = \Big[|y^{\star}_1|^{p-1}, \ldots, |y^{\star}_n|^{p-1}\Big]^{\top}
+                \]
+                и
+                \[\nabla f(y^{\star})^p = \Big[|x_1 + y^{\star}_1|^{p-1}, \ldots, |x_n + y^{\star}_n|^{p-1}\Big]^{\top}
+                \]
+
+                перпендикулярны вектору приращений $dy$, а значит коллинеарны:
+
+                \[
+                |x_i + y^{\star}_i| = \lambda |y^{\star}_i|
+                \]
+
+                \item Так как $y^{\star}$ --- точка максимума, то в знаки $x_i$ и $y^{\star}_i$ должны совпадать. То есть $y_i = k x_i$ для некоторого $k > 0$, которое можно найти следующим образом:
+
+                \[
+                k = \frac{\lVert y \rVert_p}{\lVert x \rVert_p} = \frac{C}{\lVert x \rVert_p}
+                \]
+
+                \[
+                \lVert x + y \rVert_p \leqslant \lVert x + y^{\star} \rVert_p = \lVert x + kx \rVert_p = \lVert x \rVert_p + \lVert kx \rVert_p = \lVert x \rVert_p + \lVert y \rVert_p
+                \]
+
+            \end{itemize}
+
+        \item Случай $p = \infty$
+
+            \begin{itemize}
+                \item Рассмотрим следующий предел:
+
+                \[
+                \lim\limits_{p \to \infty} \lVert x \rVert_p
+                \]
+
+                \item Пусть дан вектор $x \in V: \lVert x \rVert_{\infty} = |x_k|$. Тогда
+
+                \[
+                \lVert x \rVert_{\infty} = |x_k| = \left(\sum\limits_{i = 1}^n |x_i|^p\right)^{1/p} \leqslant \lVert x \rVert_p \leqslant \left(\sum\limits_{i = 1}^n |x_k|^p\right)^{1/p} = n^{1/p} \lVert x \rVert_{\infty} = n^{1/p} |x_k|
+                \]
+
+                \item Отсюда и из $n^{1/p} \longrightarrow 1$ при $p \longrightarrow \infty$ видно, что $\lVert x \rVert_{\infty} = \lim\limits_{p \to \infty} \lVert x \rVert_p$
+
+                \item Теперь мы можем доказать, что $\lVert x \rVert_{\infty}$ является нормой по предельным переходам
+            \end{itemize}
+    \end{enumerate}
+\end{proof}
+
+\begin{definition}
+    Пусть задано линейное векторное пространство $V$ над полем $\mathbb{R}$. \\ Функцию $\rho: V \times V \longrightarrow \mathbb{R}$ будем называть \textit{метрикой}, если выполнены следующие свойства:
+
+    \begin{itemize}
+        \item $\forall \, x, y \in V: \rho(x, y) \geqslant 0$
+        \item $\rho(x, y) = 0 \iff x = y$
+        \item $\forall \, x, y \in V: \rho(x, y) = \rho(y, x)$
+        \item $\forall \, x, y, z \in V: \rho(x + z) \leqslant \rho(x, y) + \rho(y, z)$  --- неравенство треугольника
+    \end{itemize}
+
+    Пространство $V$ с метрикой $\rho$ называется \textit{метрическим пространством}
+\end{definition}
+
+Заметим, что любая норма на линейном пространстве задает метрику:
+
+\[
+\rho(x, y) = \lVert x - y \rVert
+\]
+
+\subsection{Сходимость по норме}
+
+\begin{definition}
+    Две нормы $\lVert \cdot \rVert_a$ и $\lVert \cdot \rVert_b$ (необязательно $l_p$ нормы) на нормированном пространстве $V$ называются эквивалентными, если $\exists \, C_1, C_2 > 0: \forall \, x \in V$
+
+    \[
+    C_1 \cdot \lVert x \rVert_a \leqslant \lVert x \rVert_b \leqslant C_2 \cdot \lVert x \rVert_b
+    \]
+\end{definition}
+
+Известно, что на конечномерных пространствах все нормы являются эквивалентными. Будем говорить, что последовательность векторов $\{x_k\}$ сходится к $x$ по норме, если $\lVert x_k - x \rVert \longrightarrow 0$ при $k \longrightarrow \infty$. Так как все нормы являются эквивалентными, то для исследования сходимости можно использовать любую норму. Также для конечномерных пространств верно, что из покоордиантной сходимости следует сходимость по норме и наоборот
+
+\subsection{Норма линейного оператора}
+
+\begin{definition}
+    Пусть задано нормированное пространство $V$ с нормой $\lVert x \rVert$. Пусть задан линейный оператор $A: V \longrightarrow V$. Определим норму линейного оператора следующим образом:
+
+    \[
+    \lVert A \rVert = \sup\limits_{\lVert x \rVert \neq 0} \frac{\lVert Ax \rVert}{\lVert x \rVert}
+    \]
+\end{definition}
+
+\begin{claim}
+    Докажем, что это действительно норма, и перечислим свойства
+\end{claim}
+
+\begin{itemize}
+    \item Первые три свойства нормы выполняются
+    \item Проверим неравенство треугольника:
+
+    \[
+    \lVert A + B \rVert = \sup\limits_{\lVert x \rVert \neq 0} \frac{\lVert Ax + Bx \rVert}{\lVert x \rVert} \leqslant
+    %
+    \sup\limits_{\lVert x \rVert \neq 0} \left(
+    \frac{\lVert Ax \rVert}{\lVert x \rVert}
+    +
+    \frac{\lVert Bx \rVert}{\lVert x \rVert}
+    \right) \leqslant
+    %
+    \sup\limits_{\lVert x \rVert \neq 0} \frac{\lVert Ax \rVert}{\lVert x \rVert}
+    +
+    \sup\limits_{\lVert x \rVert \neq 0} \frac{\lVert Bx \rVert}{\lVert x \rVert} = \lVert A \rVert + \lVert B \rVert
+    \]
+
+    \item Видно из определения нормы, что
+
+    \[
+    \lVert Ax \rVert \leqslant \lVert A \rVert \cdot \lVert x \rVert
+    \]
+
+    \item Оценим сверху норму композиции операторов $BA$:
+
+    \[
+    \lVert BAx \rVert = \lVert B (Ax) \rVert \leqslant \lVert B \rVert \cdot \lVert Ax \rVert \leqslant \lVert B \rVert \cdot \lVert A \rVert \cdot \lVert x \rVert
+    \]
+
+    Поэтому $\lVert BA \rVert \leqslant \lVert B \rVert \cdot \lVert A \rVert$
+
+    \item Из линейности оператора следует, что
+
+    \[
+    \sup\limits_{\lVert x \rVert \neq 0} \frac{\lVert Ax \rVert}{\lVert x \rVert} = \sup\limits_{\lVert x \rVert \neq 0} \left\lVert A \cdot \left(\frac{x}{\lVert x \rVert}\right)\right\rVert = \sup\limits_{\lVert x \rVert = 1} \lVert Ax \rVert
+    \]
+
+    По этой причине норма любого линейного оператора на конечномерном линейном пространстве с $l_p$ нормой существует и конечна
+\end{itemize}
+
+\paragraph{Примеры}
+
+\begin{itemize}
+    \item Норма диагонального оператора $D_{n \times n} = D$ с помощью $l_p$ нормы:
+
+    \[
+    \sup\limits_{\lVert x \rVert = 1} \lVert Dx \rVert_p = \left(\sum\limits_{i = 1}^n |D_{ii}|^p \cdot |x_i|^p\right)^{1/p}
+    \]
+
+    Пусть $D_{kk} = \max\limits_{i} |D_{ii}|$. Тогда
+
+    \[
+    \left(\sum\limits_{i = 1}^n |D_{ii}|^p \cdot |x_i|^p\right)^{1/p} \leqslant \left(\sum\limits_{i = 1}^n |D_{kk}|^p \cdot |x_i|^p\right)^{1/p} = |D_{kk}| \left(\sum\limits_{i = 1}^n |x_i|\right)^{1/p}
+    \]
+
+    Получается, что
+
+    \[
+    \sup\limits_{\lVert x \rVert = 1} \lVert Dx \rVert_p \leqslant \max\limits_{i} |D_{ii}|
+    \]
+
+    Пример, на котором достигается максимум легко построить: возьмем $x = [0, \ldots, 1, \ldots, 0]^{\top}$ --- ненулевая координата только на $k$-ой позиции
+
+    \item Рассмотрим $l_2$ норму на конечномерном линейном пространстве $V$. Пусть есть некоторый оператор $A$. Известно, что любой оператор можно разложить в виде композиции поворотов, отражений и растяжений вдоль осей с положительными коэффициентами --- \href{https://en.wikipedia.org/wiki/Singular_value_decomposition}{SVD}:
+
+    \[
+    A = U_1 D U_2,
+    \]
+
+    где $U_1, U_2$ --- ортогональные матрицы, которые сохраняют расстояние $\lVert U_1 x \rVert = \lVert U_2 x \rVert = \lVert x \rVert$
+
+    \[
+    \lVert A \rVert = \sup\limits_{\lVert x \rVert = 1} \lVert A x \rVert = \sup\limits_{\lVert x \rVert = 1} \lVert U_1 D U_2 x \rVert =  \sup\limits_{\lVert x \rVert = 1} \lVert D U_2 x \rVert =  \sup\limits_{\lVert x \rVert = 1} \lVert D x \rVert = \max\limits_{i} D_{ii}
+    \]
+
+    \item Рассмотрим $l_2$ норму на конечномерном линейном пространстве $V$. Пусть есть некоторый самосопряженный оператор $A$ (заданный SPD матрицей). Тогда представим его в следующем виде:
+
+    \[
+    A = U D U^{\top},
+    \]
+
+    где $U$ --- ортогональная матрица, $D$ --- диагональная матрица из собственный значений $\lambda_i$. Аналогично предыдущему пункту:
+
+    \[
+    \lVert A \rVert = \max\limits_{i} \lambda_i
+    \]
+
+    \item Рассмотрим $l_{\infty}$ норму на конечномерном линейном пространстве $V$ и произвольный оператор $A$
+
+    \[
+    \lVert A \rVert = \sup\limits_{\lVert x \rVert = 1} \lVert Ax \rVert_{\infty} = \max\limits_{i} \left|\sum\limits_j A_{ij} x_j\right| = \left| \sum\limits_j A_{kj} x_j \right|
+    \]
+
+    Заметим, что $A_{kj}$ и $x_j$ должны быть одного знака, иначе можно поменять знак координаты $j$ вектора $x$ на противоположный и значение увеличится, что противоречит максимальности выражения. Так как $\lVert x \rVert_{\infty} = 1$, тогда есть координата $|x_m| = 1$. Тогда заменим все $x_j$ на $1$, от этого норма не изменится. В итоге получили, что
+
+    \[
+    \lVert A \rVert = \max\limits_{i} \left|\sum\limits_j A_{ij}\right|
+    \]
+\end{itemize}
+
+\subsection{Число обусловленности}
+
+\begin{definition}
+    Пусть на нормированном конечномерном пространстве $V$ задан невырожденный линейный оператор $A: V \longrightarrow V$. \textit{Числом обусловленности} линейного оператора будем называть следующее выражение:
+
+    \[
+    \kappa(A) = \lVert A \rVert \cdot \lVert A^{-1} \rVert
+    \]
+    %
+    \\Видно, что $\kappa(A) = \kappa(A^{-1})$
+\end{definition}
+
+\begin{claim}
+    Число обусловленности $\kappa(A) \geqslant 1$
+\end{claim}
+
+\begin{proof}
+    \[
+    \lVert x \rVert = \lVert A^{-1}Ax \rVert \leqslant \lVert A^{-1} \rVert \cdot \lVert Ax \rVert \leqslant \lVert A^{-1} \rVert \cdot \lVert A \rVert \cdot \lVert x \rVert = \kappa(A) \cdot \lVert x \rVert
+    \]
+\end{proof}
+
+\begin{claim}
+    Пусть $A$ --- самосопряженный линейный оператор и задана $l_2$ норма. Тогда число обусловленности равно
+
+    \[
+    \kappa(A) = \frac{\max_{i} \lambda_i}{\min_{i} \lambda_i},
+    \]
+    где $\lambda_i$ --- собственное значение матрицы $A$
+\end{claim}
+
+\begin{proof}
+    Докажем, что
+
+    \[
+    \kappa(A) = \frac{
+    \sup_{\lVert x \rVert = 1} \lVert Ax \rVert
+    }{
+    \inf_{\lVert x \rVert = 1} \lVert Ax \rVert
+    }
+    \]
+
+    \begin{itemize}
+        \item Так как $A$ --- самосопряженный оператор, то $A = U^{\top} D U$ и $A^{-1} = U^{\top} D^{-1} U$
+
+        \item Найдем $\lVert A^{-1} \rVert$
+
+        \[
+        \lVert A^{-1} \rVert = \sup\limits_{\lVert x \rVert \neq 0} \frac{\lVert A^{-1}x \rVert}{\lVert x \rVert} =    \sup\limits_{\lVert y \rVert \neq 0}\frac{\lVert A^{-1} Ay \rVert}{\lVert Ay \rVert} = \sup\limits_{\lVert y \rVert \neq 0}\frac{\lVert y \rVert}{\lVert Ay \rVert} = \frac{1}{\inf_{\lVert x \rVert = 1} \lVert Ax \rVert}
+        \]
+
+        \item Отсюда и так как задана $l_2$ норма получаем нужное равенство через собственные значения
+    \end{itemize}
+\end{proof}
+
+В общем случае, число обусловленности показывает, насколько матрица близка к сингулярной: чем больше число обусловленности, тем ближе к сингулярности
+
+\subsection{Число обусловленности и устойчивость решения системы уравнений}
+
+Рассмотрим СЛУ $Ax = b$. Допустим, что правая часть $b$ известна с точностью до ошибок $\Delta b$. Тогда мы решаем систему $Ax^{\star} = b + \Delta b$
+\\
+Пусть погрешность тогда равна $\Delta x = x^{\star} - x$. Оценим относительную ошибку:
+
+\[
+\frac{\lVert \Delta x \rVert}{\lVert x \rVert} = \frac{
+\lVert A^{-1} \Delta b \rVert
+}{
+\lVert x \rVert
+} \leqslant
+%
+\lVert A^{-1} \rVert
+\cdot
+\frac{\lVert \Delta b \lVert}{\lVert b \rVert}
+\cdot
+\frac{\lVert b \rVert}{\lVert x \rVert} =
+%
+\lVert A^{-1} \rVert
+\cdot
+\frac{\lVert \Delta b \lVert}{\lVert b \rVert}
+\cdot
+\frac{\lVert Ax \rVert}{\lVert x \rVert} \leqslant
+%
+\lVert A^{-1} \rVert \cdot \lVert A \rVert \cdot \frac{\lVert \Delta b \lVert}{\lVert b \rVert} = \kappa(A) \cdot \frac{\lVert \Delta b \lVert}{\lVert b \rVert}
+\]
+\\
+Рассмотрев $A^{-1}b = x$ аналогично можно получить следующую оценку:
+
+\[
+\frac{1}{\kappa(A)} \cdot \frac{\lVert \Delta b \rVert}{\lVert b \rVert}
+\leqslant
+\frac{\lVert \Delta x \rVert}{\lVert x \rVert}
+\leqslant
+\kappa(A) \cdot \frac{\lVert \Delta b \rVert}{\lVert b \rVert}
+\]
+\\
+СЛУ, где матрица $A$ имеет большое число обусловленности, могут иметь неустойчивые решения, которые могут сильно отличаться от аналитического решения
