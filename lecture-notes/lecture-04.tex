@@ -1,0 +1,359 @@
+\ProvidesFile{lecture-04.tex}[Лекция 4]
+
+\newpage
+
+\section{Итерационные методы}
+
+\subsection*{Постановка задачи}
+
+Рассмотрим СЛУ $Ax = y$. Предположим, что матрица $A$ является матрицей с диагональным преобладанием
+
+\subsection{Метод Якоби}\label{Jacobi method}
+
+\subsubsection*{Описание алгоритма}
+
+Рассмотрим $i$-ую строку:
+
+\[
+\sum\limits_{k=1}^n A_{ik} x_k = b_i \iff x_i = \left(b_i - \sum\limits_{k \neq i} A_{ik} x_k\right) / A_{ii}
+\]
+
+Будем теперь находить решение СЛУ итерационно, сперва проинициализировав $x_i^{(1)}$: ($t$ --- номер итерации)
+
+\[
+x_{i}^{(t+1)} = \left(b_i - \sum\limits_{k \neq i} A_{ik} x_k^{(t)}\right) / A_{ii}
+\]
+
+Пусть $D$ --- матрица диагональных элементов матрицы $A$. Тогда итерационный процесс можно записать в матричной форме:
+
+\[
+x^{(t+1)} = (I - D^{-1} A) x^{(t)} + D^{-1} b
+\]
+
+\subsubsection*{Сходимость метода Якоби}
+
+\begin{claim}
+    Метод Якоби сходится для любой стартовой точки
+\end{claim}
+
+\begin{proof}
+    Докажем, что $x^{(t)}$ сходится по \href{https://en.wikipedia.org/wiki/Cauchy%27s_convergence_test}{критерию Коши}
+
+    \begin{itemize}
+        \item Рассмотрим $\Delta_t = x^{(t+1)} - x^{(t)}$.
+
+        \[
+        \Delta_t = (I - D^{-1} A) x^{(t)} + D^{-1} b - (I - D^{-1} A) x^{(t-1)} - D^{-1} b = (I - D^{-1} A) (x^{(t)} - x^{(t-1)}) = (I - D^{-1} A) \Delta_{t-1}
+        \]
+
+        Пусть $G = (I - D^{-1} A)$ --- будем называть \textit{итерационным оператором}. Покажем, что $\lVert G \rVert < 1$ при $l_p$ норме, где $p = \infty$
+
+        \[
+        \lVert G \rVert_{\infty} = \max\limits_{i} \sum\limits_{j} |G_{ij}| = \max\limits_{i} \left( \sum\limits_{j} \frac{ |A_{ij}| }{ |A_{ii}| } - 1 \right) = \max\limits_{i} \sum\limits_{i \neq j} \frac{ |A_{ij}| }{ |A_{ii}| } < 1,
+        \]
+
+        так как $A$ матрица с диагональным преобладанием
+
+        \item Теперь оценим $\lVert \Delta_t \rVert_{\infty}$:
+
+        \[
+        \lVert \Delta_t \rVert_{\infty} = \lVert G \Delta_{t-1} \rVert_{\infty} \leqslant \lVert G \rVert_{\infty} \lVert \Delta_{t-1} \rVert_{\infty} \leqslant \ldots \leqslant \lVert G \rVert_{\infty}^{t-1} \cdot \lVert \Delta_1 \rVert_{\infty}
+        \]
+
+        \item Рассмотрим теперь критерий Коши:
+
+        \begin{multline*}
+        \lVert x^{(t + q)} - x^{(t)} \rVert_{\infty} =
+        \left\lVert x^{(1)} + \sum\limits_{i=1}^{t+q-1} \Delta_i - x^{(1)} - \sum\limits_{i=1}^{t - 1} \Delta_i \right\rVert_{\infty} = \left\lVert \sum\limits_{i=t}^{t+q-1} \Delta_i \right\rVert_{\infty} \leqslant \sum\limits_{i=t+1}^{t+q} \lVert \Delta_i \rVert \leqslant \sum\limits_{i=t+1}^{t+q} \lVert G \rVert_{\infty}^{i-1} \cdot \lVert \Delta_1 \rVert_{\infty} = \\ = \lVert G \rVert_{\infty}^{t} \cdot \frac{1 - \lVert G \rVert_{\infty}^{t+q}}{1 - \lVert G \rVert_{\infty}} \cdot \lVert \Delta_1 \rVert_{\infty}
+        \end{multline*}
+
+        Так как $\lVert G \rVert_{\infty} < 1$, то при $t \longrightarrow \infty$
+
+        \[
+        \lVert x^{(t + q)} - x^{(t)} \rVert_{\infty} \leqslant \lVert G \rVert_{\infty}^{t} \cdot \frac{1}{1 - \lVert G \rVert_{\infty}} \cdot \lVert \Delta_1 \rVert_{\infty} \longrightarrow 0
+        \]
+
+        \item Так как последовательность $x^{(t)}$ фундаментальная, то она сходится к некоторому $x^{\star}$, что и будет решением СЛУ. Переходя к пределу в равенстве для $x^{(t+1)}$, получаем, что
+
+        \[
+        x^{\star} = (I - D^{-1} A) x^{\star} + D^{-1} b \iff Ax^{\star} = b
+        \]
+    \end{itemize}
+\end{proof}
+
+\subsection{Общий вид итерационного алгоритма}
+
+Рассмотрим СЛУ $Ax = y$. Пусть $Q$ --- обратимая матрица (матрица расщепления или splitting matrix). Тогда можем преобразовать СЛУ следующим образом:
+
+\[
+Qx = (Q - A)x + y
+\]
+
+Тогда легко видеть, что решение $x$ вычисляется следующим образом:
+
+\[
+x = (I - Q^{-1} A) x + Q^{-1} y
+\]
+
+Тогда построим итерационную последовательность $x^{(t)}$:
+
+\[
+x^{(t+1)} = (I - Q^{-1} A) x^{(t)} + Q^{-1} y
+\]
+
+В общем виде последовательность имеет вид:
+
+\[
+x^{(t+1)} = G x^{(t)} + c
+\]
+
+\subsection{Спектральный радиус и сходимость}
+
+\begin{definition}
+    \textit{Спектральным радиусом} линейного оператора $A$ называется следующая величина:
+
+    \[
+    \rho(A) = \sup \{ |\lambda| : \lambda \in \spec(A) \},
+    \]
+
+     где $\spec(A)$ --- множество собственных значений (\textit{спектр}) оператора $A$
+\end{definition}
+
+Сходимость нашей итерационной последовательности определяется спектральным радиусом матрицы $G$
+
+\begin{claim}\label{convergence_iter_sle}
+    Процесс сходится из любой стартовой точки, если $\rho(A) < 1$
+\end{claim}
+
+\begin{proof}
+    Докажем сначала, что при $\rho(A) \geqslant 1$ итерационный процесс расходится, а потом докажем сходимость в обратном случае
+    \begin{itemize}
+        \item Пусть $v$ --- собственный вектор с собственным значением $| \lambda | \geqslant 1$. Тогда запустим два итерационных процесса из разных точек: $x^{(1)}$ и $\xi^{(1)} = x^{(1)} + v$. Рассмотрим их разность на $t$-ой итерации:
+
+        \[
+        \lVert x^{(t)} - \xi^{(t)} \rVert_{\infty} = \lVert G^{t} (x^{(1)} - \xi^{(1)}) \rVert_{\infty} = \lVert G^{t} v \rVert_{\infty} = | \lambda |^t \cdot \lVert v \rVert_{\infty}
+        \]
+
+        Видно, что при $\lambda \geqslant 1$ не могут одновременно сходиться
+
+        \item Основная идея: если $\rho(G) < 1$, то можно построить такую норму $\lVert \cdot \rVert$, что $\lVert G \rVert < 1$. Тогда доказать утверждение можно аналогично методу Якоби
+
+        Вспомним, что матрица $G$ разбивается на блоки --- \href{https://en.wikipedia.org/wiki/Jordan_normal_form}{жорданова нормальная форма}
+
+        \[
+        \begin{pmatrix}
+        \lambda & 1       & 0      & \cdots  & 0 \\
+        0       & \lambda & 1      & \cdots  & 0 \\
+        \vdots  & \vdots  & \vdots & \ddots  & \vdots \\
+        0       & 0       & 0      & \lambda & 1      \\
+        0       & 0       & 0      & 0       & \lambda
+        \end{pmatrix}
+        \]
+
+        Видно, что ограничение матрицы (оператора) $G$ на некоторую жорданову клетку имеет вид линейной комбинации тождественного и нильпотентного оператора:
+
+        \[
+        G|_{\mathrm{cell}} = \lambda I + N
+        \]
+
+        Тогда и сама матрица $G$ в жордановом базисе имеет вид:
+
+        \[
+        G =
+        \begin{pmatrix}
+        \lambda_1 I_1 + N_1 &                     &        &         &  \\
+                            & \lambda_2 I_1 + N_2 &        &         &  \\
+                            &                     & \ddots &         &  \\
+                            &                     &        &  \ddots &   \\
+                            &                     &        &         & \lambda_n I_n + N_n
+        \end{pmatrix}
+        \]
+
+        Рассмотрим одну жорданову клетку. Для нее существует такой вектор $v$, что набор векторов $v, N v, N^2 v, \ldots, N^{k-1} v$ --- образуют базис для некоторого подпространства. Более того $N^{k} v = 0$, так как $N$ --- нильпотентный оператор (матрица сдвига). Если жорданова клетка имеет стандартный вид, то тогда $v = [0, \ldots, 0, 1, 0, \ldots, 0]^{\top}$ ($1$ стоит на $k$-ом месте)
+
+        Тогда возьмем следующий базис $w_i = \varepsilon^{-i} N^i v$ для некоторого $\varepsilon > 0$ и $i \in \{0, \ldots, k-1\}$. Рассмотрим жорданову клетку в этом базисе:
+
+        \[
+        (\lambda I + N) w_i = \lambda w_i + N w_i = \lambda w_i + N \varepsilon^{-i} N^i v = \lambda w_i + \varepsilon \cdot \varepsilon^{-(i+1)} N^{i+1} v = \lambda w_i + \varepsilon w_{i+1}
+        \]
+
+        Получается, что жорданова клетка в этом базисе имеет вид:
+
+        \[
+        \begin{pmatrix}
+        \lambda & \varepsilon           & 0           & \cdots  & 0 \\
+        0       & \lambda               & \varepsilon & \cdots  & 0 \\
+        \vdots  & \vdots                & \vdots      & \ddots  & \vdots \\
+        0       & 0                     & 0           & \lambda & \varepsilon \\
+        0       & 0                     & 0           & 0       & \lambda
+        \end{pmatrix}
+        \]
+
+        Проделаем так с каждой жордановой клеткой матрицы $G$. Получаем матрицу $S$ перехода из одного базиса в другой и матрицу $G$ в виде:
+
+        \[
+        S^{-1} G S =
+        \begin{pmatrix}
+        \lambda_1 I_1 + \varepsilon N_1   &                                   &        &         & \\
+                                          & \lambda_2 I_1 + \varepsilon N_2   &        &         & \\
+                                          &                                   & \ddots &         & \\
+                                          &                                   &        &  \ddots & \\
+                                          &                                   &        &         & \lambda_n I_n + \varepsilon N_n
+        \end{pmatrix}
+        \]
+
+        Рассмотрим $l_{\infty}$ норму в построенном новом базисе и получим, что
+
+        \[
+        \lVert G \rVert_{\infty} = \max\limits_{i} \sum\limits_{j} |G_{ij}| = \max\limits_{i} (\lambda_j + \varepsilon) = \rho(G) + \varepsilon
+        \]
+
+        Так как $\rho(G) < 1$, то можно подобрать такое $\varepsilon > 0$, что $\lVert G \rVert_{\infty} < 1$. Далее доказываем аналогично методу Якоби
+    \end{itemize}
+\end{proof}
+
+\newpage
+
+\subsection{Метод Гаусса-Зейделя}\label{Gauss-Zeldel method}
+
+В отличие от прошлого метода, в методе Гаусса-Зейделя чтобы посчитать все координаты вектора $x^{(t+1)}$, можно использовать не только $x^{(t)}$, но и уже посчитанные координаты этого вектора на этой же итерации
+
+\subsubsection*{Описание алгоритма}
+
+Пусть $x^{(t)}$ --- решение на $t$ шаге. Тогда на следующем шаге решение вычисляется следующим образом:
+
+\[
+x_i^{(t+1)} = \left( b_i - \sum\limits_{j < i} A_{ij} x_j^{(t+1)} - \sum\limits_{j > i} A_{ij} x_j^{(t)} \right) / A_{ii}
+\]
+
+Пусть матрица $A = L + U^{\star}$, где $L$ --- нижняя треугольная матрица, $U^{\star}$ --- строго верхняя треугольная матрица (нулевая диагональ). Тогда уравнение можно переписать в виде:
+
+\[
+Ax = y \iff Lx = b - U^{\star}x \implies x^{(t+1)} = L^{-1} (b - U^{\star} x^{(t)})
+\]
+
+Или в ином виде:
+
+\[
+x^{(t+1)} = (I - L^{-1} A) x^{(t)} + L^{-1} y
+\]
+
+\paragraph{Замечание}
+
+Метод Гаусса-Зейделя дает небольшой выигрыш по памяти, так как можем перезаписывать значения вектора $x^{(t)}$, и имеет может иметь чуть лучшую сходимость и точность, так как мы переиспользуем уже вычисленные значения
+
+\subsubsection*{Сходимость метода Гаусса-Зейделя}
+
+\begin{claim}
+    Метод Гаусса-Зейделя сходится для любой стартовой точки.
+\end{claim}
+
+\begin{proof}
+    Согласно \ref{convergence_iter_sle} достаточно доказать, что $G = I - L^{-1} A$ такая, что $\rho(G) < 1$
+
+    Пусть $x$ --- собственный вектор с собственным значением $\lambda$ матрицы $G$. Тогда
+
+    \[
+    Gx = (I - L^{-1} A) x = \lambda x
+    \]
+
+    Домножим это равенство справа на матрицу $L$:
+
+    \[
+    L \cdot (I - L^{-1} A) x = (L - A) x = -U x = \lambda L x
+    \]
+
+    Пусть теперь $i: |x_i| = \max_j |x_j| > 0$ и перепишем верхнее равенство в координатной форме:
+
+    \[
+    \lambda A_{ii} x_i + \lambda \sum\limits_{j < i} A_{ij} x_j = - \sum\limits_{j > i} A_{ij} x_j
+    \]
+
+    Оценим собственное значение $\lambda$ по модулю, воспользовавшись обратным неравенством треугольника и поделим на $x_i$:
+
+    \[
+    |\lambda| \cdot \left(A_{ii} - \sum\limits_{j < i} |A_{ij}| \right) \leqslant \sum\limits_{j > i} |A_{ij}|
+    \]
+
+    Отсюда и, вспомнив, что $A$ --- матрица с диагональным преобладанием, следует, что
+
+    \[
+    |\lambda| \leqslant \frac{
+    \sum_{j > i} |A_{ij}|
+    }{
+    A_{ii} - \sum_{j < i} |A_{ij}|
+    } < 1
+    \]
+\end{proof}
+
+\subsection{Метод Релаксации. SOR}
+
+Теперь пусть матрица $A$ --- эрмитовый (самосопряженный) оператор, то есть:
+
+\[
+A = A^{\star},
+\]
+
+где $A^{\star}$ --- транспонированная комплексно-сопряженная матрица $A$
+
+\subsubsection*{Описание алгоритма}
+
+Пусть $\alpha > 1/2$ --- некоторый параметр, $D$ --- диагональ матрицы $A$ и матрица $C$ такая, что $C + C^{\star} = D - A$.
+
+Тогда матрицы расщепления возьмем $Q = \alpha D - C$ и получаем итерационный процесс:
+
+\[
+x^{(t+1)} = (I - Q^{-1} A) x^{(t)} + Q^{-1} b,
+\]
+
+который сходится к решению нашей СЛУ
+
+\subsubsection*{Сходимость метода релаксации}
+
+\begin{claim}
+    Полученный итерационный процесс сходится для любой стартовой точки
+\end{claim}
+
+\begin{proof}
+        Согласно \ref{convergence_iter_sle} достаточно доказать, что $G = I - Q^{-1} A$ такая, что $\rho(G) < 1$.
+
+        Пусть $x$ --- собственный вектор с собственным значением $\lambda$ матрицы $G$. Тогда
+
+        \[
+        Gx = (I - Q^{-1} A) x = \lambda x
+        \]
+
+        Введем теперь вектор $y = (I - G) x = x - Gx$
+
+        Заметим, что
+
+        \[
+        y = (I - G) x = (I - I + Q^{-1} A) x = Q^{-1} A x \implies (\alpha D - C) y = A x
+        \]
+
+        А также, что
+
+        \[
+        (Q - A) y = Ax - Ay = A (x - y) = A G x \iff (\alpha D - D + C^{\star}) y = A G x
+        \]
+
+        Домножим первое и второе равенство на скалярно (эрмитово скалярное произведение) $y$:
+
+        \begin{equation*}
+            \begin{cases}
+                \alpha \langle D y, y \rangle - \langle C y, y \rangle = \langle A x, y \rangle \\
+                %
+                \alpha \langle y, D y \rangle  - \langle y, D y \rangle + \langle y, C^{\star} y \rangle = \langle y, A G x \rangle
+            \end{cases}
+        \end{equation*}
+
+        Так как $D$ --- тоже эрмитова матрица, то $\langle Dy, y \rangle = \langle y, Dy \rangle$. Также верно, что $\langle C y, y \rangle = \langle y, C^{\star} y \rangle$, так как $C^{\star}$ сопряженный оператор для $C$. Сложим два уравнения и получим:
+
+        \[
+        (2\alpha - 1) \langle Dy, y \rangle = \langle A x, y \rangle + \langle y, A G x \rangle = \langle A x, x - Gx \rangle + \langle x - G x, A G x \rangle = (1 - |\lambda|^2) \cdot \langle A x, x \rangle
+        \]
+
+        Так как $\forall \, x \neq 0: \langle A x \rangle > 0$, то случай $|\lambda| = 1$ невозможен ($y = 0$), поэтому так как слева и справа положительные числа, то $|\lambda| < 1$, что означает, что $\rho(G) < 1$
+\end{proof}
+
+\paragraph{Замечание} Можно взять в качестве матрицы $C$ строго нижнюю часть матрицы $A$. Тогда $C^{\star}$ --- строго верхняя часть матрицы $A$
