@@ -1,0 +1,135 @@
+\ProvidesFile{lecture-06.tex}[Лекция 6]
+
+\newpage
+
+\section{Метод бисопряженных градиентов}
+
+\subsection*{Напоминание}
+
+На прошлой лекции рассматривалась следующая задача:
+
+$$
+Ax = b,
+$$
+
+где $A_{n \times n}$ --- SPD матрица. Для таких матриц и был придуман метод сопряженных градиентов, который сходится за $n$ шагов в точной арифметике
+
+\begin{itemize}
+    \item Инициализация: $x_1 = 0$ (обязательно), $r_1 = b$, $d_1 = r_1$ --- вектор направлений
+
+    \item $k$-ая итерация:
+
+    \begin{equation*}
+        \begin{dcases*}
+            x_{k+1} = x_k + \alpha_k d_k\\
+            r_{k+1} = r_k - \alpha_k A d_k\\
+            \alpha_k = \frac{\langle d_k, r_k \rangle}{\langle d_k, d_k \rangle_A}\\
+        \end{dcases*}
+    \end{equation*}
+\end{itemize}
+
+Одной из главных особенностей метода сопряженных градиентов является ортогональность векторов невязок $r_k$ и направлений $d_k$ --- ключевое свойство для доказательства сходимости за $n$ шагов.
+Можно ли построить такой же алгоритм для несимметричной матрицы $A$?
+
+\subsection*{Двойственность}
+
+\begin{definition}
+    Пусть $V$ --- линейное пространство над полем $\mathbb{F}$. Тогда двойственным (или сопряженным) к нему пространством назовем:
+    \[
+        V^{\star} = \{f: V \longrightarrow \mathbb{F}: f \text{ --- линейное над } \mathbb{F} \}
+    \]
+\end{definition}
+
+Скалярное произведение на линейном пространстве $V$ позволяет отождествить само пространство $V$ со множеством линейных функций на $V$:
+
+\[
+    f(x) = f \left( \sum\limits_i x_i e_i \right) = \sum\limits_i x_i f(e_i) = \sum\limits_i x_i f_i = \innerproduct{x}{f},
+\]
+
+то есть в ортонормированном базисе линейной функции со значениями $f_i$ на базисных векторах $e_i$ ставится в соответствие вектор $[f_1, \ldots, f_n]^{\top}$
+
+Но если на пространстве $V$ не задано скалярное произведение, то и соответствия между $V$ и пространством его линейных функций можно построить, но будет зависеть от выбора базиса
+
+По этой причине в методе бисопряженных градиентов строятся $4$ последовательности векторов: $2$ последовательности векторов и $2$ последовательности связанных с ними функций
+
+\subsection*{Двойственность и линейные операторы}
+
+Пусть $A: V \longrightarrow V$ --- линейный оператор, $f: V \longrightarrow \R$ --- линейная функция. Возьмем произвольный $x \in V$:
+
+\[
+    f^{\top} Ax = f(Ax) = \sum\limits_i f_i \sum\limits_j A_{ij} x_j = \sum\limits_j \left( \sum\limits_i A_{ij} f_i \right) x_j = (A^{\star} f)(x) = (A^{\top} f)^{\top} x
+\]
+
+То есть по $A$ мы можем построить линейный оператор $A^{\star}: V^{\star} \longrightarrow V^{\star}: A^{\star} = A^{\top}$
+
+
+\subsection{Алгоритм}
+
+\begin{itemize}
+    \item Инициализация $x_1$. По начальному приближению строится вектор невязки $r_1 = b - Ax_1$.
+
+    Затем задается линейная функция $\hat{r}_1 = \hat{r}_1(r_1) = \hat{r}_1^{\top} r_1 \neq 0$. Наиболее популярный вариант: $\hat{r}_1 = r_1$
+
+    Векторы направлений строятся как $p_1 = r_1, \hat{p}_1 = \hat{r}_1$
+
+    \item $k+1$-ая итерация:
+
+    \begin{equation*}
+        \begin{dcases*}
+            x_{k+1} = x_k + \alpha_k p_k\\
+            r_{k+1} = r_k - \alpha_k A p_k\\
+            \hat{r}_{k+1} = \hat{r}_k - \alpha_k A^{\top} \hat{p}_k\\
+            p_{k+1} = r_{k+1} + \beta_k p_k\\
+            \hat{p}_{k+1} = \hat{r}_{k+1} + \beta_k \hat{p}_k\\
+            \alpha_k = \frac{\hat{r}_k r_k}{ \hat{p}_k A p_k}\\
+            \beta_k = \frac{\hat{r}_{k+1} r_{k+1}}{\hat{r}_k r_k}
+        \end{dcases*}
+    \end{equation*}
+\end{itemize}
+
+\subsection{Доказательство алгоритма}
+
+\subsubsection*{Ортогональность}
+
+\begin{claim}
+    Для любых $i \neq j$ выполняются следующие условия:
+
+    \[
+        \begin{cases}
+            \innerproduct{\hat{r}_i}{r_j} = \hat{r}_i^{\top} r_j = 0\\
+            \innerproduct{\hat{p}_i}{Ap_j} = \hat{p}_i^{\top} A p_j = 0
+        \end{cases}
+    \]
+\end{claim}
+
+\begin{proof}
+    Доказываем по индукции $k = \max(i, j)$
+
+    \begin{itemize}
+        \item Заметим, что (доказывается по индукции)
+            \begin{align*}
+                \mathrm{span}(r_1, \ldots, r_k) = \mathrm{span}(p_1, \ldots, p_k)\\
+                \mathrm{span}(\hat{r}_1, \ldots, \hat{r}_k) = \mathrm{span}(\hat{p}_1, \ldots, \hat{p}_k)
+            \end{align*}
+
+        \item Пусть $j = k + 1, i < k$:
+            \begin{align*}
+                \hat{r}_i^{\top} r_{k + 1} &= \hat{r}_i^{\top} r_k - \alpha_k \hat{r}_i^{\top} A p_k = 0 - 0 = 0\\
+                \hat{p}_i^{\top} A p_{k + 1} &= \hat{p}_i^{\top} \cdot \frac{r_k - r_{k + 1}}{\alpha_k} = \frac{1}{\alpha_k} \hat{p}_i^{\top} r_k - \frac{1}{\alpha_k} \hat{p}_i^{\top} r_{k + 1} = 0 - 0 = 0
+            \end{align*}
+
+        \item Для $i = k$ ортогональность выполняется из-за выбора коэффициентов $\alpha_k$ и $\beta_k$:
+            \[
+                \hat{r}_k^{\top} r_{k + 1} = \hat{r}_k^{\top} r_k - \alpha_k \hat{r}_k^{\top} A p_k = \hat{r}_k^{\top} r_k - \alpha_k \hat{p}_k^{\top} A p_k + \beta_{k - 1} \alpha_k \hat{p}_{k - 1} A p_k = 0\, (\text{подставим } \alpha_k)
+            \]
+
+            Аналогично для векторов направлений:
+
+            \[
+                \hat{p}_k A p_{k + 1} = (A^{\top} \hat{p}_k)^{\top} p_{k + 1} = (A^{\top} \hat{p}_k)^{\top} r_{k + 1} + \beta_k (A^{\top} \hat{p}_k)^{\top} p_k = -\frac{1}{\alpha_k} \hat{r}_{k + 1}^{\top} r_{k + 1} + \beta_k (A^{\top} \hat{p}_k)^{\top} p_k = 0
+            \]
+    \end{itemize}
+\end{proof}
+
+
+\subsection{Проблемы алгоритма}
