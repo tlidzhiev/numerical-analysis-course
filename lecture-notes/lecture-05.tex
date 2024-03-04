@@ -331,7 +331,7 @@ d_{k+1} = r_{k+1} + \frac{\langle r_{k+1}, r_{k+1} \rangle}{\langle r_k, r_k \ra
     \begin{dcases*}
         x_{k+1} = x_k + \alpha_k d_k\\
         r_{k+1} = r_k - \alpha_k A d_k\\
-        \alpha_k = \frac{\langle r_k, r_k \rangle}{\langle d_k, r_k \rangle_A}\\
+        \alpha_k = \frac{\langle r_k, r_k \rangle}{\langle d_k, d_k \rangle_A}\\
         \beta_k = \frac{\langle r_{k+1}, r_{k+1} \rangle}{\langle r_k, r_k \rangle}\\
         d_{k+1} = r_{k+1} + \beta_k d_k
     \end{dcases*}
